@@ -30,7 +30,7 @@
 // CRC-framed link without modification.
 
 #define PL_SYNC_WORD 0x1ACFFC1Du
-#define PL_MIN_BODY_LEN 
+#define PL_MIN_BODY_LEN 7   // ICD A2: 6-byte SPP header + at least 1 octet of data
 #define PL_MAX_BODY_LEN 518 // in this project: 6-byte SPP header + up to 512 bytes of user data
 #define PL_MAX_FRAME_LEN (4 + 2 + PL_MAX_BODY_LEN + 2)
 

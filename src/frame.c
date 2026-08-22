@@ -8,7 +8,7 @@ size_t plframe_encode(const uint8_t *body_bytes, size_t body_len, uint8_t *frame
     (void)frame_buf;
 
     if (body_len == 0 || body_len > PL_MAX_BODY_LEN || body_len < PL_MIN_BODY_LEN) {
-        return 0
+        return 0;
     }
 
     // TODO:
