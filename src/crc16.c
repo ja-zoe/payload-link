@@ -1,4 +1,5 @@
-#include "payload_link/crc16.h"
+#include "payload_link/crc16.h" 
+#include <stddef.h>
 
 uint16_t crc16_ccitt(const uint8_t *data, size_t length) {
     (void)data;
@@ -19,6 +20,5 @@ uint16_t crc16_ccitt(const uint8_t *data, size_t length) {
     //
     // Get test/test_crc16.c passing (both the "123456789" vector AND the
     // zero-length case, which should return 0xFFFF unchanged) before moving on.
-
     return 0;
 }

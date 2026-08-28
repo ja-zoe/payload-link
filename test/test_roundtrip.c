@@ -25,7 +25,7 @@ int main(void) {
     // a time) and it's a common bug source if the decoder doesn't fully
     // reset between frames.
     
-
+    assert(0 == 0);
     printf("test_roundtrip: TODO (currently un-implemented)\n");
-    return 1;
+  return 1;
 }

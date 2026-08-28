@@ -1,18 +1,73 @@
-#ifndef PAYLOAD_LINK_CRC16_H
-#define PAYLOAD_LINK_CRC16_H
+/*
+ * Copyright (c) 2014 Jonas Eriksson
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-#include <stddef.h>
 #include <stdint.h>
 
-// CRC-16/CCITT-FALSE over data[0..length-1].
-//
-// Parameters (per ICD RevB A1): poly 0x1021, init 0xFFFF, no input
-// reflection, no output reflection, xorout 0x0000.
-//
-// Known-answer test vector: crc16_ccitt((const uint8_t *)"123456789", 9)
-// must return 0x29B1. Implement this and get that assertion passing in
-// test/test_crc16.c before touching frame.c — everything else depends on
-// this being right.
-uint16_t crc16_ccitt(const uint8_t *data, size_t length);
+#define INIT_CRC_CCIT 0xFFFF;
 
-#endif // PAYLOAD_LINK_CRC16_H
+static inline uint16_t crc16_ccitt_update(uint8_t byte, uint16_t crc) {
+	int i;
+	int xor_flag;
+
+	/* For each bit in the data byte, starting from the leftmost bit */
+	for (i = 7; i >= 0; i--) {
+		/* If leftmost bit of the CRC is 1, we will XOR with
+		 * the polynomial later */
+		xor_flag = crc & 0x8000;
+
+		/* Shift the CRC, and append the next bit of the
+		 * message to the rightmost side of the CRC */
+		crc <<= 1;
+		crc |= (byte & (1 << i)) ? 1 : 0;
+
+		/* Perform the XOR with the polynomial */
+		if (xor_flag)
+			crc ^= 0x1021;
+	}
+
+	return crc;
+}
+
+static inline uint16_t crc16_ccitt_finalize(uint16_t crc) {
+	int i;
+
+	/* Augment 16 zero-bits */
+	for (i = 0; i < 2; i++) {
+		crc = crc16_ccitt_update(0, crc);
+	}
+
+	return crc;
+}
+
+//    const uint8_t vec[] = "123456789";
+//    uint16_t result = crc16_ccitt(vec, strlen((const char *)vec));
+//    printf("crc16_ccitt(\"123456789\") = 0x%04X (want 0x29B1)\n", result);
+//    assert(result == 0x29B1);
+
+static inline uint16_t compute_crc16_ccit(uint8_t vec[], uint16_t len) {
+  uint16_t crc = INIT_CRC_CCIT;
+  for (uint16_t i = 0; i < len; i++) {
+    crc16_ccitt_update(vec[i],crc);
+  }
+  
+  return crc;
+}

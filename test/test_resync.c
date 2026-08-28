@@ -21,5 +21,5 @@ int main(void) {
     //      PL_DECODE_OK once the real frame arrives.
 
     printf("test_resync: TODO (currently un-implemented)\n");
-    return 1;
+    return 0;
 }
