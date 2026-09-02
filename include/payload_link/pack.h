@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// Big-endian pack/unpack helpers (ICD §2.1: all multi-byte fields are
-// transmitted big-endian regardless of host endianness).
+// Big-endian pack/unpack helpers. Their output is independent of host
+// endianness.
 //
 // Each pack_* writes at buf + *off, then advances *off by the field size.
 // Each unpack_* reads from buf + *off, then advances *off by the field size.

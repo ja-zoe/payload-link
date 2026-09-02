@@ -12,13 +12,9 @@ static void print_bytes(const char *label, const uint8_t *bytes, size_t size) {
 }
 
 int main(void) {
-    /*
-     * The framer treats this as opaque data. In the mission application these
-     * bytes would contain a complete six-byte CCSDS header followed by data.
-     */
+    /* The framer treats these bytes as an opaque body. */
     const uint8_t outgoing_body[] = {
-        0x08, 0x01, 0xC0, 0x00, 0x00, 0x02, /* example CCSDS header */
-        0x10, 0x20, 0x30,                   /* example packet data */
+        0x08, 0x01, 0xC0, 0x00, 0x00, 0x02, 0x10, 0x20, 0x30,
     };
     uint8_t encoded_frame[PL_MAX_FRAME_LEN];
     plframe_decode_ctx_t decoder;

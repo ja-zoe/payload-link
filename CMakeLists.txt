@@ -21,9 +21,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     target_compile_options(payload_link_example PRIVATE ${PL_WARN_FLAGS})
 endif()
 
-# Build tests for standalone builds and when a cFS mission enables its unit
-# tests.  These are ordinary CTest executables; they do not depend on OSAL's
-# ut_assert library or the cFS coverage-test helpers.
+# Build tests for standalone builds and when a parent project enables them.
+# These are ordinary CTest executables with no external test dependency.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR ENABLE_UNIT_TESTS)
     enable_testing()
     add_subdirectory(test)
