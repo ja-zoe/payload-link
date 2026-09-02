@@ -9,14 +9,22 @@ set(PL_WARN_FLAGS -Wall -Wextra -Wpedantic -pedantic-errors)
 add_library(payload_link STATIC
     src/crc16.c
     src/pack.c
+    src/framer.c
     src/frame.c
 )
 target_include_directories(payload_link PUBLIC include)
 target_compile_options(payload_link PRIVATE ${PL_WARN_FLAGS})
 
-# Only build tests when this is the top-level project — not when a consumer
-# add_subdirectory()s this into their own build.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    add_executable(payload_link_example examples/consumer.c)
+    target_link_libraries(payload_link_example PRIVATE payload_link)
+    target_compile_options(payload_link_example PRIVATE ${PL_WARN_FLAGS})
+endif()
+
+# Build tests for standalone builds and when a cFS mission enables its unit
+# tests.  These are ordinary CTest executables; they do not depend on OSAL's
+# ut_assert library or the cFS coverage-test helpers.
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR ENABLE_UNIT_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()

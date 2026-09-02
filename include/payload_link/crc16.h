@@ -20,54 +20,14 @@
  * THE SOFTWARE.
  */
 
+#ifndef PAYLOAD_LINK_CRC16_H
+#define PAYLOAD_LINK_CRC16_H
+
+#include <stddef.h>
 #include <stdint.h>
 
-#define INIT_CRC_CCIT 0xFFFF;
+#define INIT_CRC_CCIT 0xFFFF
 
-static inline uint16_t crc16_ccitt_update(uint8_t byte, uint16_t crc) {
-	int i;
-	int xor_flag;
+uint16_t compute_crc16_ccit(const uint8_t input_stream[], size_t len);
 
-	/* For each bit in the data byte, starting from the leftmost bit */
-	for (i = 7; i >= 0; i--) {
-		/* If leftmost bit of the CRC is 1, we will XOR with
-		 * the polynomial later */
-		xor_flag = crc & 0x8000;
-
-		/* Shift the CRC, and append the next bit of the
-		 * message to the rightmost side of the CRC */
-		crc <<= 1;
-		crc |= (byte & (1 << i)) ? 1 : 0;
-
-		/* Perform the XOR with the polynomial */
-		if (xor_flag)
-			crc ^= 0x1021;
-	}
-
-	return crc;
-}
-
-static inline uint16_t crc16_ccitt_finalize(uint16_t crc) {
-	int i;
-
-	/* Augment 16 zero-bits */
-	for (i = 0; i < 2; i++) {
-		crc = crc16_ccitt_update(0, crc);
-	}
-
-	return crc;
-}
-
-//    const uint8_t vec[] = "123456789";
-//    uint16_t result = crc16_ccitt(vec, strlen((const char *)vec));
-//    printf("crc16_ccitt(\"123456789\") = 0x%04X (want 0x29B1)\n", result);
-//    assert(result == 0x29B1);
-
-static inline uint16_t compute_crc16_ccit(uint8_t vec[], uint16_t len) {
-  uint16_t crc = INIT_CRC_CCIT;
-  for (uint16_t i = 0; i < len; i++) {
-    crc16_ccitt_update(vec[i],crc);
-  }
-  
-  return crc;
-}
+#endif /* PAYLOAD_LINK_CRC16_H */

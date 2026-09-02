@@ -15,6 +15,37 @@ Encodes and decodes the RS-422 frame between the busOBC and payOBC, per ICD RevB
 Consumed by the `payload_if` cFS app, the busOBC standalone binary, and the Pi daemon — all three
 link against the same compiled library so the byte format cannot drift between them.
 
+## Generic framer and ICD profile
+
+The library has two layers:
+
+- `payload_link/framer.h` is an allocation-free configurable engine for
+  `SYNC | LENGTH | BODY | CHECKSUM` byte streams. A `plframer_config_t`
+  supplies the sync bytes, a 1-8 byte length field and its byte order, body
+  bounds, checksum size, and checksum callback. Decoder storage is supplied by
+  the caller, so the engine does not depend on a heap.
+- `payload_link/frame.h` is this mission's ICD profile. It supplies the RevB
+  sync marker, two-byte big-endian length, body bounds, and CRC-16 callback,
+  while preserving the original `plframe_*` API for mission consumers.
+
+Changing a field width in a new profile therefore changes configuration and
+storage sizes, not the generic state-machine logic. See
+`test/test_framer_config.c` for a non-ICD profile with a five-byte sync marker,
+three-byte little-endian length, and three-byte checksum.
+
+## Consumer example
+
+`examples/consumer.c` shows the mission-facing API from both sides: it encodes
+an opaque packet body, then simulates a UART receiver by feeding the encoded
+frame into the decoder one byte at a time and handling every decoder result.
+It is built automatically when this repository is the top-level project:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+./build/payload_link_example
+```
+
 ## Wire format (ICD RevB §2.4 + C8)
 
 ```
@@ -40,4 +71,14 @@ mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 make
 ctest --output-on-failure
+```
+
+When this repository is included in a cFS build with `add_subdirectory()`, its
+tests are also registered when the mission is configured with
+`-DENABLE_UNIT_TESTS=ON`. They are plain CTest executables using the C standard
+library and do not link against OSAL's `ut_assert` library. Run them from the
+cFS build directory with:
+
+```
+ctest --output-on-failure -R '^(crc16|roundtrip|resync|framer_config)$'
 ```

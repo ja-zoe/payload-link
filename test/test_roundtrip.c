@@ -9,23 +9,50 @@
 #include "payload_link/frame.h"
 
 int main(void) {
-    // TODO:
-    //   1. Build a fake body buffer (doesn't need to be a real CCSDS SPP
-    //      header -- any 6+L bytes will do, since this library treats the
-    //      body as opaque).
-    //   2. plframe_encode() it into a frame buffer.
-    //   3. plframe_decode_init() a context.
-    //   4. Feed the frame buffer into plframe_decode_feed() one byte at a
-    //      time, in a loop, until you get PL_DECODE_OK.
-    //   5. assert the decoded ctx->body/ctx->body_len matches what you started with.
-    //
-    // Once that passes, add a second case: two frames back-to-back in one
-    // buffer, decoded in a single feed loop, checking both come out right.
-    // That's the realistic UART scenario (bytes don't arrive one frame at
-    // a time) and it's a common bug source if the decoder doesn't fully
-    // reset between frames.
-    
-    assert(0 == 0);
-    printf("test_roundtrip: TODO (currently un-implemented)\n");
-  return 1;
+    const uint8_t body[] = {0x08, 0x01, 0xC0, 0x00, 0x00,
+                            0x02, 0xAA, 0x55, 0x42};
+    uint8_t frame[PL_MAX_FRAME_LEN];
+    uint8_t max_body[PL_MAX_BODY_LEN];
+    uint8_t max_frame[PL_MAX_FRAME_LEN];
+    plframe_decode_ctx_t ctx;
+    size_t frame_len = plframe_encode(body, sizeof(body), frame);
+
+    assert(frame_len == PL_SYNC_LEN + PL_LENGTH_LEN + sizeof(body) + PL_CRC_LEN);
+
+    plframe_decode_init(&ctx);
+    for (size_t pass = 0; pass < 2; pass++) {
+        for (size_t i = 0; i < frame_len; i++) {
+            plframe_decode_result_t result = plframe_decode_feed(&ctx, frame[i]);
+
+            if (i + 1 < frame_len) {
+                assert(result == PL_DECODE_NEED_MORE);
+            } else {
+                assert(result == PL_DECODE_OK);
+                assert(ctx.body_len == sizeof(body));
+                assert(memcmp(ctx.body, body, sizeof(body)) == 0);
+            }
+        }
+    }
+
+    for (size_t i = 0; i < sizeof(max_body); i++) {
+        max_body[i] = (uint8_t)i;
+    }
+    frame_len = plframe_encode(max_body, sizeof(max_body), max_frame);
+    assert(frame_len == PL_MAX_FRAME_LEN);
+
+    plframe_decode_init(&ctx);
+    for (size_t i = 0; i < frame_len; i++) {
+        plframe_decode_result_t result = plframe_decode_feed(&ctx, max_frame[i]);
+
+        if (i + 1 < frame_len) {
+            assert(result == PL_DECODE_NEED_MORE);
+        } else {
+            assert(result == PL_DECODE_OK);
+            assert(ctx.body_len == sizeof(max_body));
+            assert(memcmp(ctx.body, max_body, sizeof(max_body)) == 0);
+        }
+    }
+
+    printf("test_roundtrip: ok\n");
+    return 0;
 }

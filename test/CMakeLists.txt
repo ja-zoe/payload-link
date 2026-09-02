@@ -9,3 +9,7 @@ add_test(NAME roundtrip COMMAND test_roundtrip)
 add_executable(test_resync test_resync.c)
 target_link_libraries(test_resync PRIVATE payload_link)
 add_test(NAME resync COMMAND test_resync)
+
+add_executable(test_framer_config test_framer_config.c)
+target_link_libraries(test_framer_config PRIVATE payload_link)
+add_test(NAME framer_config COMMAND test_framer_config)
