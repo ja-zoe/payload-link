@@ -32,11 +32,9 @@ static void payload_link_crc(void *user_data,
     (void)user_data;
     (void)sync;
     (void)sync_size;
-    (void)length_field;
-    (void)length_size;
-
     assert(checksum_size == PL_CRC_LEN);
-    crc = compute_crc16_ccit(body, body_size);
+    crc = update_crc16_ccit(INIT_CRC_CCIT, length_field, length_size);
+    crc = update_crc16_ccit(crc, body, body_size);
     checksum_out[0] = (uint8_t)(crc >> 8);
     checksum_out[1] = (uint8_t)crc;
 }

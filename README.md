@@ -50,7 +50,8 @@ cmake --build build
 - `SYNC` is the fixed marker used to find frame boundaries.
 - `LENGTH` is a big-endian `uint16_t` containing only the body size.
 - `BODY` is passed through without interpretation.
-- `CRC-16` is CRC-16/CCITT-FALSE over the body bytes.
+- `CRC-16` is CRC-16/CCITT-FALSE over the encoded length field followed by the
+  body bytes. The sync word and CRC field are excluded.
 
 ## Build and test
 

@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Big-endian pack/unpack helpers. Their output is independent of host
 // endianness.
 //
@@ -21,5 +25,9 @@ uint8_t  unpack_u8(const uint8_t *buf, size_t *off);
 uint16_t unpack_be16(const uint8_t *buf, size_t *off);
 uint32_t unpack_be32(const uint8_t *buf, size_t *off);
 uint64_t unpack_be64(const uint8_t *buf, size_t *off);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PAYLOAD_LINK_PACK_H
