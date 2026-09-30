@@ -15,10 +15,13 @@ target_link_libraries(test_framer_config PRIVATE payload_link)
 add_test(NAME framer_config COMMAND test_framer_config)
 
 # The C++ test proves the public headers can be consumed from C++ (for example
-# by the NOS3 PayOBC simulator). Skip it when no C++ compiler is available.
+# by the NOS3 PayOBC simulator). It only runs in standalone builds: a parent
+# project may compile this library with C-only flags (such as cFE coverage
+# instrumentation) that its C++ link step would not match. Skip it when no C++
+# compiler is available.
 include(CheckLanguage)
 check_language(CXX)
-if(CMAKE_CXX_COMPILER)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND CMAKE_CXX_COMPILER)
     enable_language(CXX)
     add_executable(test_cxx_linkage test_cxx_linkage.cpp)
     target_link_libraries(test_cxx_linkage PRIVATE payload_link)
