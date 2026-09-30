@@ -26,6 +26,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define INIT_CRC_CCIT 0xFFFF
 
 /* Continues a CRC-16/CCITT-FALSE calculation from the supplied state. */
@@ -34,5 +38,9 @@ uint16_t update_crc16_ccit(uint16_t crc,
                            size_t len);
 
 uint16_t compute_crc16_ccit(const uint8_t input_stream[], size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PAYLOAD_LINK_CRC16_H */

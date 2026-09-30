@@ -6,6 +6,10 @@
 
 #include "payload_link/framer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Payload-link ICD profile:
  *
@@ -67,5 +71,9 @@ void plframe_decode_init(plframe_decode_ctx_t *ctx);
 /* Feeds exactly one byte. body and body_len are valid after PL_DECODE_OK. */
 plframe_decode_result_t plframe_decode_feed(plframe_decode_ctx_t *ctx,
                                              uint8_t byte);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PAYLOAD_LINK_FRAME_H */

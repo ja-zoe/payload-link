@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Length fields are decoded into uint64_t, so they may contain 1-8 bytes. */
 #define PLFRAMER_MAX_LENGTH_SIZE sizeof(uint64_t)
 
@@ -108,5 +112,9 @@ bool plframer_decoder_init(plframer_decoder_t *decoder,
 
 plframer_decode_result_t plframer_decoder_feed(plframer_decoder_t *decoder,
                                                 uint8_t byte);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PAYLOAD_LINK_FRAMER_H */
