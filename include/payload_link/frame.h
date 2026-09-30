@@ -11,6 +11,9 @@
  *
  *   | SYNC 0x1ACFFC1D (4B) | LENGTH (2B BE) | body (L bytes) | CRC-16 (2B) |
  *
+ * CRC-16/CCITT-FALSE covers the encoded LENGTH field followed by the body.
+ * The SYNC word and CRC field are excluded.
+ *
  * The generic framing behavior lives in framer.h. These constants and the
  * PLFRAME_ICD_CONFIG object specialize it for ICD RevB section 2.4 / C8.
  */
